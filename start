@@ -8,7 +8,7 @@ SCRIPT_HOME=$PWD
 
 OS_SUFFIX="linux"
 if [[ "$OSTYPE" == "darwin"* ]]; then
-    let OS_SUFFIX="macosx"
+    OS_SUFFIX="macosx"
 fi
 
 setSDKPath () {
