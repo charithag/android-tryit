@@ -6,10 +6,18 @@ command -v unzip >/dev/null || { echo "unzip is not installed. Aborting." >&2; e
 
 SCRIPT_HOME=$PWD
 
-OS_SUFFIX="linux"
+OS_SUFFIX="linu"
 if [[ "$OSTYPE" == "darwin"* ]]; then
     OS_SUFFIX="macosx"
 fi
+
+downloadArtifacts() {
+    curl -D headers -O $1
+    httpStatus=$(head -1 headers | awk '{print $2}')
+    [ "$httpStatus" != "200" ] && { echo "Download failed. Aborting." ; exit 1 ;}
+    rm headers
+    echo
+}
 
 setSDKPath () {
     echo -n "Please provide Android SDK location (ex: /mnt/tools/android-sdk):"
@@ -29,9 +37,7 @@ getAndroidSDK() {
     mkdir android-sdk
     cd android-sdk
 
-    curl -O https://dl.google.com/android/repository/tools_r25.2.5-$OS_SUFFIX.zip
-    [ -f "tools_r25.2.5-$OS_SUFFIX.zip" ] || { echo "Download failed. Aborting." ; exit 1 ;}
-    echo
+    downloadArtifacts "https://dl.google.com/android/repository/tools_r25.2.5-$OS_SUFFIX.zip"
     echo -n "Configuring Android SDK tools..."
     unzip -q tools_r25.2.5-$OS_SUFFIX.zip
     rm tools_r25.2.5-$OS_SUFFIX.zip
@@ -39,9 +45,8 @@ getAndroidSDK() {
 
     echo
     echo "Downloading Android platform tools..."
-    curl -O http://dl.google.com/android/repository/platform-tools_r25.0.3-$OS_SUFFIX.zip
-    [ -f "platform-tools_r25.0.3-$OS_SUFFIX.zip" ] || { echo "Download failed. Aborting." ; exit 1 ;}
-    echo
+    downloadArtifacts "http://dl.google.com/android/repository/platform-tools_r25.0.3-$OS_SUFFIX.zip"
+
     echo -n "Configuring Android platform tools..."
     unzip -q platform-tools_r25.0.3-$OS_SUFFIX.zip
     rm platform-tools_r25.0.3-$OS_SUFFIX.zip
@@ -55,9 +60,7 @@ createAVD() {
         echo
         echo "Downloading Android platform..."
         cd $ANDROID_TRYIT_SDK_HOME
-        curl -O https://dl.google.com/android/repository/platform-24_r02.zip
-        [ -f "platform-24_r02.zip" ] || { echo "Download failed. Aborting." ; exit 1 ;}
-        echo
+        downloadArtifacts "https://dl.google.com/android/repository/platform-24_r02.zip"
         echo -n "Configuring Android platform..."
         unzip -q platform-24_r02.zip
         mkdir -p platforms/android-24
@@ -70,9 +73,7 @@ createAVD() {
     if [ ! -d "$ANDROID_TRYIT_SDK_HOME/system-images/android-24/default" ]; then
         echo "Downloading Android system image..."
         cd $ANDROID_TRYIT_SDK_HOME
-        curl -O https://dl.google.com/android/repository/sys-img/android/x86-24_r07.zip
-        [ -f "x86-24_r07.zip" ] || { echo "Download failed. Aborting." ; exit 1 ;}
-        echo
+        downloadArtifacts "https://dl.google.com/android/repository/sys-img/android/x86-24_r07.zip"
         echo -n "Configuring Android system image..."
         unzip -q x86-24_r07.zip
         mkdir -p system-images/android-24/default
@@ -150,9 +151,7 @@ if [ ! -d "$ANDROID_TRYIT_SDK_HOME/build-tools/25.0.2" ]; then
     echo
     echo "Downloading Android build tools..."
     cd $ANDROID_TRYIT_SDK_HOME
-    curl -O https://dl.google.com/android/repository/build-tools_r25.0.2-$OS_SUFFIX.zip
-    [ -f "build-tools_r25.0.2-$OS_SUFFIX.zip" ] || { echo "Download failed. Aborting." ; exit 1 ;}
-    echo
+    downloadArtifacts "https://dl.google.com/android/repository/build-tools_r25.0.2-$OS_SUFFIX.zip"
     echo -n "Configuring Android build tools..."
     unzip -q build-tools_r25.0.2-$OS_SUFFIX.zip
     mkdir -p build-tools/25.0.2
