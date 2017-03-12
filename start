@@ -6,7 +6,7 @@ command -v unzip >/dev/null || { echo "unzip is not installed. Aborting." >&2; e
 
 SCRIPT_HOME=$PWD
 
-OS_SUFFIX="linu"
+OS_SUFFIX="linux"
 if [[ "$OSTYPE" == "darwin"* ]]; then
     OS_SUFFIX="macosx"
 fi
@@ -122,14 +122,26 @@ startAVD() {
             createAVD
         fi
     else
+        $ANDROID_TRYIT_SDK_HOME/platform-tools/adb kill-server
         echo -n "Enter AVD number to start (eg: 1): "
         read answer
         let answer--
         echo "Starting AVD ${devices[$answer]}"
-        $ANDROID_TRYIT_SDK_HOME/platform-tools/adb kill-server
-        $ANDROID_TRYIT_SDK_HOME/tools/emulator -avd ${devices[$answer]} &
+        $ANDROID_TRYIT_SDK_HOME/tools/emulator -avd ${devices[$answer]} > emulator.log &
+        while [ ! -f "$HOME/.android/avd/${devices[$answer]}.avd/cache.img" -a COUNT ]
+        do
+           sleep 1
+           echo -n "."
+        done
+        count=0
+        while [ $count -lt 5 ]
+        do
+           sleep 1
+           echo -n "."
+           let count++
+        done
+        echo
     fi
-    echo
 }
 
 echo "+----------------------------------------------------------------+"
@@ -175,8 +187,6 @@ fi
 app=$SCRIPT_HOME/apks/client-release.apk
 pkg=$($ANDROID_TRYIT_SDK_HOME/build-tools/25.0.2/aapt dump badging $app|awk -F" " '/package/ {print $2}'|awk -F"'" '/name=/ {print $2}')
 act=$($ANDROID_TRYIT_SDK_HOME/build-tools/25.0.2/aapt dump badging $app|awk -F" " '/launchable-activity/ {print $2}'|awk -F"'" '/name=/ {print $2}')
-
-echo "$pkg/$act"
 
 hasAgent=false
 
