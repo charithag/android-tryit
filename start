@@ -149,7 +149,7 @@ runEmulator(){
         echo -n "Configuring HAXM..."
         unzip -q haxm-macosx_r6_0_5.zip
         rm haxm-macosx_r6_0_5.zip
-        ./"HAXM installation" -log $SCRIPT_HOME/haxm_silent_run.log
+        ./"HAXM installation" -m 2048 -log $SCRIPT_HOME/haxm_silent_run.log
         echo "    Done!"
         echo
     fi
