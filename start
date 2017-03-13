@@ -141,6 +141,7 @@ startAVD() {
 
 runEmulator(){
     if [ $OS_SUFFIX = "macosx" -a ! -f $ANDROID_TRYIT_SDK_HOME/extras/intel/Hardware_Accelerated_Execution_Manager ]; then
+        cd $ANDROID_TRYIT_SDK_HOME
         echo "Downloading intel HAXM..."
         mkdir -p extras/intel/Hardware_Accelerated_Execution_Manager
         cd extras/intel/Hardware_Accelerated_Execution_Manager
