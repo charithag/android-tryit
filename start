@@ -140,6 +140,21 @@ startAVD() {
 }
 
 runEmulator(){
+    if [ $OS_SUFFIX = "macosx" -a ! -f $ANDROID_TRYIT_SDK_HOME/extras/intel/Hardware_Accelerated_Execution_Manager ]; then
+        echo "Downloading intel HAXM..."
+        cd $ANDROID_TRYIT_SDK_HOME
+        downloadArtifacts "https://dl.google.com/android/repository/extras/intel/haxm-macosx_r6_0_5.zip"
+        echo -n "Configuring HAXM..."
+        unzip -q haxm-macosx_r6_0_5.zip
+        mkdir -p extras/intel/Hardware_Accelerated_Execution_Manager
+        mv haxm-macosx_r6_0_5/* extras/intel/Hardware_Accelerated_Execution_Manager/
+        rm -r haxm-macosx_r6_0_5
+        rm haxm-macosx_r6_0_5.zip
+        cd extras/intel/Hardware_Accelerated_Execution_Manager
+        ./"HAXM installation" -log $SCRIPT_HOME/haxm_silent_run.log
+        echo "    Done!"
+        echo
+    fi
     $ANDROID_TRYIT_SDK_HOME/platform-tools/adb kill-server
     echo "Starting AVD $1"
     $ANDROID_TRYIT_SDK_HOME/tools/emulator -avd $1 > emulator.log &
